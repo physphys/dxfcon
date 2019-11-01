@@ -16,7 +16,6 @@ def sisyagonyu(points):
 
 
 def make_con(points, dir):
-    print(dir + 'generated.con')
     with open(dir + '/' + 'generated.con', mode='w') as f:
         f.write(
             "PX60000;\n\nSZ0.6;\nR20.9000,0.9000;3.9000,3.9000;\nSI0;\nSJ0;\nST0;\n\n")
@@ -52,7 +51,7 @@ def dxf_layers(dxf_file_path):
 def button_clicked(file, layer):
     dir = os.path.dirname(file)
     make_con(read_blocks(file, layer), dir)
-    quit()
+    sys.exit()
 
 
 root = tkinter.Tk()
