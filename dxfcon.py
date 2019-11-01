@@ -3,16 +3,8 @@ import dxfgrabber
 import os
 import sys
 import tkinter.filedialog
-import tkinter.messagebox
-
-
-def select_dxf_file():
-    root = tkinter.Tk()
-    root.withdraw()
-    fTyp = [("", "dxf")]
-    iDir = os.path.abspath(os.path.dirname(__file__))
-    file = tkinter.filedialog.askopenfilename(filetypes=fTyp, initialdir=iDir)
-    return file
+from tkinter import *
+from tkinter import ttk
 
 
 def sisyagonyu(points):
@@ -23,8 +15,9 @@ def sisyagonyu(points):
     return [x, y]
 
 
-def make_con(points):
-    with open('test.con', mode='w') as f:
+def make_con(points, dir):
+    print(dir + 'generated.con')
+    with open(dir + '/' + 'generated.con', mode='w') as f:
         f.write(
             "PX60000;\n\nSZ0.6;\nR20.9000,0.9000;3.9000,3.9000;\nSI0;\nSJ0;\nST0;\n\n")
         for i, point in enumerate(points):
@@ -56,7 +49,34 @@ def dxf_layers(dxf_file_path):
     return [layer.name for layer in dxf.layers]
 
 
-file = select_dxf_file()
-# select_layer(dxf_layers(file))
-# layer_name = select_layer(dxf_layers(file))
-# make_con(read_blocks(file, layer_name))
+def button_clicked(file, layer):
+    dir = os.path.dirname(file)
+    make_con(read_blocks(file, layer), dir)
+    quit()
+
+
+root = tkinter.Tk()
+root.withdraw()
+fTyp = [("", "dxf")]
+iDir = os.path.abspath(os.path.dirname(__file__))
+file = tkinter.filedialog.askopenfilename(filetypes=fTyp, initialdir=iDir)
+
+
+layers = dxf_layers(file)
+
+
+root = tkinter.Tk()
+root.title("Select layer")
+frame = ttk.Frame(root, padding=10)
+frame.grid()
+
+combo_box = ttk.Combobox(frame)
+combo_box['values'] = tuple(layers)
+combo_box.set(layers[0])
+combo_box.grid(row=0, column=0)
+
+# Button
+button = ttk.Button(
+    frame, text='OK', command=lambda: button_clicked(file, combo_box.get()))
+button.grid(row=0, column=1)
+root.mainloop()
