@@ -1,9 +1,18 @@
 from decimal import Decimal, ROUND_HALF_UP
 import dxfgrabber
+import os
+import sys
+import tkinter.filedialog
+import tkinter.messagebox
 
-# input these params
-DXF_FILE_PATH = "./5mm_overlap.dxf"
-LAYER_NAME = "0"
+
+def select_dxf_file():
+    root = tkinter.Tk()
+    root.withdraw()
+    fTyp = [("", "dxf")]
+    iDir = os.path.abspath(os.path.dirname(__file__))
+    file = tkinter.filedialog.askopenfilename(filetypes=fTyp, initialdir=iDir)
+    return file
 
 
 def sisyagonyu(points):
@@ -42,4 +51,12 @@ def read_blocks(dxf_file_path, layer_name):
     return center_points
 
 
-make_con(read_blocks(DXF_FILE_PATH, LAYER_NAME))
+def dxf_layers(dxf_file_path):
+    dxf = dxfgrabber.readfile(dxf_file_path)
+    return [layer.name for layer in dxf.layers]
+
+
+file = select_dxf_file()
+# select_layer(dxf_layers(file))
+# layer_name = select_layer(dxf_layers(file))
+# make_con(read_blocks(file, layer_name))
