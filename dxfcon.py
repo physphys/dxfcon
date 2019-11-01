@@ -1,9 +1,10 @@
 from decimal import Decimal, ROUND_HALF_UP
 import dxfgrabber
-
-# input these params
-DXF_FILE_PATH = "./5mm_overlap.dxf"
-LAYER_NAME = "0"
+import os
+import sys
+import tkinter.filedialog
+from tkinter import *
+from tkinter import ttk
 
 
 def sisyagonyu(points):
@@ -14,8 +15,8 @@ def sisyagonyu(points):
     return [x, y]
 
 
-def make_con(points):
-    with open('test.con', mode='w') as f:
+def make_con(points, dir):
+    with open(dir + '/' + 'generated.con', mode='w') as f:
         f.write(
             "PX60000;\n\nSZ0.6;\nR20.9000,0.9000;3.9000,3.9000;\nSI0;\nSJ0;\nST0;\n\n")
         for i, point in enumerate(points):
@@ -42,4 +43,39 @@ def read_blocks(dxf_file_path, layer_name):
     return center_points
 
 
-make_con(read_blocks(DXF_FILE_PATH, LAYER_NAME))
+def dxf_layers(dxf_file_path):
+    dxf = dxfgrabber.readfile(dxf_file_path)
+    return [layer.name for layer in dxf.layers]
+
+
+def button_clicked(file, layer):
+    dir = os.path.dirname(file)
+    make_con(read_blocks(file, layer), dir)
+    sys.exit()
+
+
+root = tkinter.Tk()
+root.withdraw()
+fTyp = [("", "dxf")]
+iDir = os.path.abspath(os.path.dirname(__file__))
+file = tkinter.filedialog.askopenfilename(filetypes=fTyp, initialdir=iDir)
+
+
+layers = dxf_layers(file)
+
+
+root = tkinter.Tk()
+root.title("Select layer")
+frame = ttk.Frame(root, padding=10)
+frame.grid()
+
+combo_box = ttk.Combobox(frame)
+combo_box['values'] = tuple(layers)
+combo_box.set(layers[0])
+combo_box.grid(row=0, column=0)
+
+# Button
+button = ttk.Button(
+    frame, text='OK', command=lambda: button_clicked(file, combo_box.get()))
+button.grid(row=0, column=1)
+root.mainloop()
